@@ -31,6 +31,11 @@ public class Book {
     @Min(value = 0, message = "Available copies cannot be negative")
     private int availableCopies;
 
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
+
+
     public Book() {
     }
 
@@ -80,5 +85,13 @@ public class Book {
 
     public void setAvailableCopies(int availableCopies) {
         this.availableCopies = availableCopies;
+    }
+
+    public Category getCategory() {
+        return category;
+    }
+
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }
