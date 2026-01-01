@@ -1,7 +1,9 @@
 package com.example.library.service;
 
+import com.example.library.model.Role;
 import com.example.library.model.User;
 import com.example.library.repository.UserRepository;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -10,13 +12,14 @@ import java.util.List;
 public class UserService {
 
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
-    // DI prin constructor
-    public UserService(UserRepository userRepository) {
+    public UserService(UserRepository userRepository,
+                       PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
+        this.passwordEncoder = passwordEncoder;
     }
 
-    // listare doar utilizatori activi
     public List<User> getAllActiveUsers() {
         return userRepository.findByActiveTrue();
     }
@@ -28,7 +31,13 @@ public class UserService {
 
     public User createUser(User user) {
         user.setId(null);
-        user.setActive(true);  //noul user e activ implicit
+        user.setActive(true);
+
+        user.setRole(Role.USER);
+
+        String encoded = passwordEncoder.encode(user.getPassword());
+        user.setPassword(encoded);
+
         return userRepository.save(user);
     }
 
@@ -38,10 +47,16 @@ public class UserService {
         existing.setName(updatedUser.getName());
         existing.setEmail(updatedUser.getEmail());
 
+        if (updatedUser.getPassword() != null && !updatedUser.getPassword().isBlank()) {
+            String encoded = passwordEncoder.encode(updatedUser.getPassword());
+            existing.setPassword(encoded);
+        }
+
+        existing.setRole(updatedUser.getRole());
+
         return userRepository.save(existing);
     }
 
-    // dezactivare cont in loc de stergere
     public void deactivateUser(Long id) {
         User existing = getUserById(id);
         existing.setActive(false);
