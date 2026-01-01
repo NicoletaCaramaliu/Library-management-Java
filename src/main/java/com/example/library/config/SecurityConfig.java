@@ -44,6 +44,9 @@ public class SecurityConfig {
 
                         // user management (listare, dezactivare, etc.) - doar ADMIN
                         .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("ADMIN")
+                        // USER NEAUTENTIFICAT PENTRU POST
+                        .requestMatchers(HttpMethod.POST, "/api/users/**").anonymous()
 
                         // orice user autentificat poate cere imprumut/vedea istoricul propriu
                         .requestMatchers("/api/loans/**").authenticated()

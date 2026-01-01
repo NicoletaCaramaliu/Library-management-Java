@@ -50,4 +50,25 @@ public class BookController {
     public void delete(@PathVariable Long id) {
         bookService.deleteBook(id);
     }
+
+    @GetMapping("/search/title")
+    public List<Book> searchByTitle(@RequestParam String title) {
+        return bookService.searchByTitle(title);
+    }
+
+    @GetMapping("/search/author")
+    public List<Book> searchByAuthor(@RequestParam String author) {
+        return bookService.searchByAuthor(author);
+    }
+
+    @GetMapping("/search/category")
+    public List<Book> searchByCategory(@RequestParam String category) {
+        return bookService.searchByCategoryName(category);
+    }
+    // GET /api/books/search?keyword=clean
+    @GetMapping("/search")
+    public List<Book> search(@RequestParam String keyword) {
+        return bookService.searchAnywhere(keyword);
+    }
+
 }

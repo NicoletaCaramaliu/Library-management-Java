@@ -11,7 +11,6 @@ public class BookService {
 
     private final BookRepository bookRepository;
 
-    // Dependency Injection prin constructor
     public BookService(BookRepository bookRepository) {
         this.bookRepository = bookRepository;
     }
@@ -46,4 +45,27 @@ public class BookService {
         Book existing = getBookById(id);
         bookRepository.delete(existing);
     }
+
+    public List<Book> searchByTitle(String title) {
+        return bookRepository.findByTitleContainingIgnoreCase(title);
+    }
+
+    public List<Book> searchByAuthor(String author) {
+        return bookRepository.findByAuthorContainingIgnoreCase(author);
+    }
+
+    public List<Book> searchByCategoryName(String categoryName) {
+        return bookRepository.findByCategory_NameIgnoreCase(categoryName);
+    }
+
+    public List<Book> searchAnywhere(String keyword) {
+        return bookRepository
+                .findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCaseOrCategory_NameContainingIgnoreCase(
+                        keyword,
+                        keyword,
+                        keyword
+                );
+
+    }
+
 }
