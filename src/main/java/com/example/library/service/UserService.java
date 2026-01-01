@@ -62,4 +62,25 @@ public class UserService {
         existing.setActive(false);
         userRepository.save(existing);
     }
+
+    public User getUserByEmail(String email) {
+        return userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+    }
+
+    // update pentru userul curent
+    public User updateCurrentUser(String email, User updatedData) {
+        User existing = getUserByEmail(email);
+
+        existing.setName(updatedData.getName());
+        existing.setEmail(updatedData.getEmail());
+
+        if (updatedData.getPassword() != null && !updatedData.getPassword().isBlank()) {
+            String encoded = passwordEncoder.encode(updatedData.getPassword());
+            existing.setPassword(encoded);
+        }
+
+
+        return userRepository.save(existing);
+    }
 }

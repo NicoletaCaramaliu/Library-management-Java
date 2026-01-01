@@ -5,6 +5,7 @@ import com.example.library.service.UserService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -49,4 +50,19 @@ public class UserController {
     public void deactivate(@PathVariable Long id) {
         userService.deactivateUser(id);
     }
+
+    // GET /api/users/me - profilul utilizatorului logat
+    @GetMapping("/me")
+    public User getCurrentUser(Authentication authentication) {
+        String email = authentication.getName(); // username = email
+        return userService.getUserByEmail(email);
+    }
+
+    // PUT /api/users/me - actualizare profil utiliz logat
+    @PutMapping("/me")
+    public User updateCurrentUser(@Valid @RequestBody User user, Authentication authentication) {
+        String email = authentication.getName();
+        return userService.updateCurrentUser(email, user);
+    }
+
 }
