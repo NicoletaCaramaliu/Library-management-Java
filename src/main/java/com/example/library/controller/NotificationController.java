@@ -48,4 +48,12 @@ public class NotificationController {
         String email = authentication.getName();
         notificationService.deleteNotification(id, email);
     }
+
+    // POST /api/notifications/overdue-alert for librarian
+    @PostMapping("/overdue-alert")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    public void createOverdueAlertForLibrarians() {
+        notificationService.notifyLibrariansAboutOverdueLoansMoreThanWeekManual();
+    }
+
 }

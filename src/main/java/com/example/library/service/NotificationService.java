@@ -2,11 +2,14 @@ package com.example.library.service;
 
 import com.example.library.model.Loan;
 import com.example.library.model.Notification;
+import com.example.library.model.Role;
 import com.example.library.model.User;
+import com.example.library.repository.LoanRepository;
 import com.example.library.repository.NotificationRepository;
 import com.example.library.repository.UserRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -15,11 +18,14 @@ public class NotificationService {
 
     private final NotificationRepository notificationRepository;
     private final UserRepository userRepository;
+    private final LoanRepository loanRepository;
 
     public NotificationService(NotificationRepository notificationRepository,
-                               UserRepository userRepository) {
+                               UserRepository userRepository,
+                               LoanRepository loanRepository) {
         this.notificationRepository = notificationRepository;
         this.userRepository = userRepository;
+        this.loanRepository = loanRepository;
     }
 
     public List<Notification> getNotificationsForUser(Long userId) {
@@ -86,4 +92,32 @@ public class NotificationService {
         n.setCreatedAt(LocalDateTime.now());
         return notificationRepository.save(n);
     }
+
+    public void notifyLibrariansAboutOverdueLoansMoreThanWeekManual() {
+
+        LocalDate today = LocalDate.now();
+        LocalDate limit = today.minusWeeks(1);
+
+        // imprumuturi overdue cu mai mult de o saptamana
+        List<Loan> overdueLoans =
+                loanRepository.findByDueDateBeforeAndReturnDateIsNull(limit);
+
+        if (overdueLoans.isEmpty()) {
+            return;
+        }
+
+        String message = "Exista " + overdueLoans.size()
+                + " imprumuturi intarziate cu mai mult de o saptamana.";
+
+        List<User> librarians = userRepository.findByRole(Role.LIBRARIAN);
+
+        for (User librarian : librarians) {
+            Notification n = new Notification();
+            n.setUser(librarian);
+            n.setMessage(message);
+            n.setCreatedAt(LocalDateTime.now());
+            notificationRepository.save(n);
+        }
+    }
+
 }

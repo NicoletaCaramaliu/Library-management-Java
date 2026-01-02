@@ -1,7 +1,9 @@
 package com.example.library.service;
 
+import com.example.library.exception.BusinessException;
 import com.example.library.model.Category;
 import com.example.library.repository.CategoryRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,7 +23,7 @@ public class CategoryService {
 
     public Category getCategoryById(Long id) {
         return categoryRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Category not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("Category not found with id: " + id, HttpStatus.NOT_FOUND));
     }
 
     public Category createCategory(Category category) {

@@ -1,5 +1,6 @@
 package com.example.library.service;
 
+import com.example.library.exception.BusinessException;
 import com.example.library.model.Book;
 import com.example.library.model.Loan;
 import com.example.library.model.User;
@@ -7,6 +8,7 @@ import com.example.library.repository.BookRepository;
 import com.example.library.repository.LoanRepository;
 import com.example.library.repository.UserRepository;
 import com.example.library.service.NotificationService;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import com.example.library.model.Role;
 
@@ -51,17 +53,17 @@ public class LoanService {
 
     public Loan createLoan(Long userId, Long bookId) {
         User user = userRepository.findById(userId)
-                .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+                .orElseThrow(() -> new BusinessException("User not found with id: " + userId, HttpStatus.NOT_FOUND));
 
         Book book = bookRepository.findById(bookId)
-                .orElseThrow(() -> new RuntimeException("Book not found with id: " + bookId));
+                .orElseThrow(() -> new BusinessException("Book not found with id: " + bookId, HttpStatus.NOT_FOUND));
 
         if (!user.isActive()) {
-            throw new RuntimeException("User is not active");
+            throw new BusinessException("User is not active", HttpStatus.BAD_REQUEST);
         }
 
         if (book.getAvailableCopies() <= 0) {
-            throw new RuntimeException("No copies available for this book");
+            throw new BusinessException("No copies available for this book", HttpStatus.BAD_REQUEST);
         }
 
         book.setAvailableCopies(book.getAvailableCopies() - 1);
@@ -81,17 +83,17 @@ public class LoanService {
         Loan loan = getLoanById(loanId);
 
         if (loan.getReturnDate() != null) {
-            throw new RuntimeException("Loan already returned");
+            throw new BusinessException("Loan already returned", HttpStatus.BAD_REQUEST);
         }
 
         User currentUser = userRepository.findByEmail(currentUserEmail)
-                .orElseThrow(() -> new RuntimeException("Current user not found: " + currentUserEmail));
+                .orElseThrow(() -> new BusinessException("Current user not found: " + currentUserEmail, HttpStatus.NOT_FOUND));
 
         boolean isOwner = loan.getUser().getId().equals(currentUser.getId());
         boolean isStaff = currentUser.getRole() == Role.LIBRARIAN || currentUser.getRole() == Role.ADMIN;
 
         if (!isOwner && !isStaff) {
-            throw new RuntimeException("You are not allowed to return this loan");
+            throw new BusinessException("You are not allowed to return this loan", HttpStatus.BAD_REQUEST);
         }
 
         loan.setReturnDate(LocalDate.now());
@@ -111,21 +113,21 @@ public class LoanService {
 
     public Loan createLoanForUserEmail(String email, Long bookId) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+                .orElseThrow(() -> new BusinessException("User not found with email: " + email, HttpStatus.NOT_FOUND));
 
         return createLoan(user.getId(), bookId);
     }
 
     public List<Loan> getLoansForUserEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+                .orElseThrow(() -> new BusinessException("User not found with email: " + email, HttpStatus.NOT_FOUND));
 
         return getLoansForUser(user.getId());
     }
 
     public List<Loan> getActiveLoansForUserEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
+                .orElseThrow(() -> new BusinessException("User not found with email: " + email, HttpStatus.NOT_FOUND));
 
         return loanRepository.findByUserIdAndReturnDateIsNull(user.getId());
     }

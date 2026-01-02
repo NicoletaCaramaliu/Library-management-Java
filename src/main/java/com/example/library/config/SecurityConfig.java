@@ -64,6 +64,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/loans/*/return").hasAnyRole("USER", "LIBRARIAN", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/loans", "/api/loans/overdue/notify").hasAnyRole("LIBRARIAN", "ADMIN")
 
+                        .requestMatchers(HttpMethod.POST, "/api/notifications/overdue-alert").hasRole( "ADMIN")
 
                         .anyRequest().authenticated()
                 )

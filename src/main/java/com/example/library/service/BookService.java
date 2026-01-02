@@ -1,7 +1,9 @@
 package com.example.library.service;
 
+import com.example.library.exception.BusinessException;
 import com.example.library.model.Book;
 import com.example.library.repository.BookRepository;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,11 +23,11 @@ public class BookService {
 
     public Book getBookById(Long id) {
         return bookRepository.findById(id)
-                .orElseThrow(() -> new RuntimeException("Book not found with id: " + id));
+                .orElseThrow(() -> new BusinessException("Book not found with id: " + id, HttpStatus.NOT_FOUND));
     }
 
     public Book createBook(Book book) {
-        book.setId(null); //  ID nou generat
+        book.setId(null);
         return bookRepository.save(book);
     }
 
