@@ -66,6 +66,13 @@ public class SecurityConfig {
 
                         .requestMatchers(HttpMethod.POST, "/api/notifications/overdue-alert").hasRole( "ADMIN")
 
+                        //reviews
+                        .requestMatchers(HttpMethod.POST, "/api/reviews").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/book/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/reviews/me").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/reviews").authenticated()
+
+
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults());

@@ -20,7 +20,10 @@ public class User {
     private String name;
 
     @NotBlank(message = "Email is required")
-    @Email(message = "Email must be valid")
+    @Email(
+            regexp = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,}$",
+            message = "Email must be valid. Ex: text@gmail.com"
+    )
     @Size(max = 100, message = "Email must be at most 100 characters")
     @Column(unique = true)
     private String email;
