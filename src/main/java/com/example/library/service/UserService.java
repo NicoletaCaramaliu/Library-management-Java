@@ -24,6 +24,16 @@ public class UserService {
         return userRepository.findByActiveTrue();
     }
 
+    public List<User> getAllUsers() {
+        return userRepository.findAll();
+    }
+
+    public User activateUser(Long id) {
+        User existing = getUserById(id);
+        existing.setActive(true);
+        return userRepository.save(existing);
+    }
+
     public User getUserById(Long id) {
         return userRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("User not found with id: " + id));
@@ -68,7 +78,6 @@ public class UserService {
                 .orElseThrow(() -> new RuntimeException("User not found with email: " + email));
     }
 
-    // update pentru userul curent
     public User updateCurrentUser(String email, User updatedData) {
         User existing = getUserByEmail(email);
 

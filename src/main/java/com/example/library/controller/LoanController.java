@@ -95,5 +95,12 @@ public class LoanController {
         return loanService.getAllActiveLoans();
     }
 
+    // POST /api/loans/overdue/notify
+    @PostMapping("/overdue/notify")
+    public int notifyOverdueLoans() {
+        return loanService.createOverdueNotifications();
+    }
+
+
 
 }

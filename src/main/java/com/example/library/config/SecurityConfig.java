@@ -27,11 +27,10 @@ public class SecurityConfig {
                                 "/swagger-ui.html"
                         ).permitAll()
 
-                        .requestMatchers(HttpMethod.POST, "/api/users").permitAll()
 
                         // catalog de carți, cautare: toti
-                        .requestMatchers(HttpMethod.GET, "/api/books/**").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/books/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/categories/**").authenticated()
 
                         // doar LIBRARIAN + ADMIN pot adăuga carti
                         .requestMatchers(HttpMethod.POST, "/api/books/**").hasAnyRole("LIBRARIAN", "ADMIN")
@@ -43,34 +42,29 @@ public class SecurityConfig {
                         .requestMatchers("/api/categories/**").hasAnyRole("LIBRARIAN", "ADMIN")
 
                         // user management (listare, dezactivare, etc.) - doar ADMIN
+                        .requestMatchers(HttpMethod.GET, "/api/users/me").authenticated()
+                        .requestMatchers(HttpMethod.PUT, "/api/users/me").authenticated()
                         .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/users/{id}").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/users/{id}").hasRole("ADMIN")
                         // USER NEAUTENTIFICAT PENTRU POST
-                        .requestMatchers(HttpMethod.POST, "/api/users/**").anonymous()
+                        .requestMatchers(HttpMethod.POST, "/api/users").anonymous()
 
                         // loans
-                        .requestMatchers("/api/loans/borrow/**").authenticated()
-                        .requestMatchers("/api/loans/me").authenticated()
-
+                        .requestMatchers("/api/loans/borrow/**").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, "/api/loans").hasAnyRole("LIBRARIAN", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/loans/overdue").hasAnyRole("LIBRARIAN", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/loans/user/**").hasAnyRole("LIBRARIAN", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/loans").hasAnyRole("LIBRARIAN", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/loans/**").hasAnyRole("LIBRARIAN", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/loans/me/active").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/loans/me").hasRole("USER")
                         .requestMatchers(HttpMethod.GET, "/api/loans/allActive").hasAnyRole("LIBRARIAN", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/loans/*/return").hasAnyRole("USER", "LIBRARIAN", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/loans", "/api/loans/overdue/notify").hasAnyRole("LIBRARIAN", "ADMIN")
 
 
-                        // orice user autentificat poate cere imprumut/vedea istoricul propriu
-                        .requestMatchers("/api/loans/**").authenticated()
-
-                        // notificari: orice user autentificat
-                        .requestMatchers("/api/notifications/**").authenticated()
-
-                        // rapoarte: doar ADMIN
-                        .requestMatchers("/api/reports/**").hasRole("ADMIN")
-
-                        // orice altceva -> autentificat
                         .anyRequest().authenticated()
                 )
                 .httpBasic(Customizer.withDefaults());

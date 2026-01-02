@@ -14,7 +14,6 @@ public class CategoryController {
 
     private final CategoryService categoryService;
 
-    // DI prin constructor
     public CategoryController(CategoryService categoryService) {
         this.categoryService = categoryService;
     }

@@ -6,6 +6,7 @@ import com.example.library.model.User;
 import com.example.library.repository.BookRepository;
 import com.example.library.repository.LoanRepository;
 import com.example.library.repository.UserRepository;
+import com.example.library.service.NotificationService;
 import org.springframework.stereotype.Service;
 import com.example.library.model.Role;
 
@@ -18,13 +19,16 @@ public class LoanService {
     private final LoanRepository loanRepository;
     private final BookRepository bookRepository;
     private final UserRepository userRepository;
+    private final NotificationService notificationService;
 
     public LoanService(LoanRepository loanRepository,
                        BookRepository bookRepository,
-                       UserRepository userRepository) {
+                       UserRepository userRepository,
+                       NotificationService notificationService) {
         this.loanRepository = loanRepository;
         this.bookRepository = bookRepository;
         this.userRepository = userRepository;
+        this.notificationService = notificationService;
     }
 
     public List<Loan> getAllLoans() {
@@ -60,7 +64,6 @@ public class LoanService {
             throw new RuntimeException("No copies available for this book");
         }
 
-        // scad un exemplar
         book.setAvailableCopies(book.getAvailableCopies() - 1);
         bookRepository.save(book);
 
@@ -81,11 +84,9 @@ public class LoanService {
             throw new RuntimeException("Loan already returned");
         }
 
-        // cine este userul curent?
         User currentUser = userRepository.findByEmail(currentUserEmail)
                 .orElseThrow(() -> new RuntimeException("Current user not found: " + currentUserEmail));
 
-        // daca este simplu USER, poate returna doar imprumuturile lui
         boolean isOwner = loan.getUser().getId().equals(currentUser.getId());
         boolean isStaff = currentUser.getRole() == Role.LIBRARIAN || currentUser.getRole() == Role.ADMIN;
 
@@ -93,7 +94,6 @@ public class LoanService {
             throw new RuntimeException("You are not allowed to return this loan");
         }
 
-        // logica de returnare
         loan.setReturnDate(LocalDate.now());
 
         Book book = loan.getBook();
@@ -132,6 +132,18 @@ public class LoanService {
 
     public List<Loan> getAllActiveLoans() {
         return loanRepository.findByReturnDateIsNull();
+    }
+
+    public int createOverdueNotifications() {
+        List<Loan> overdue = getOverdueLoans();
+        int count = 0;
+        for (Loan loan : overdue) {
+            String msg = "Loan for book '" + loan.getBook().getTitle()
+                    + "' is overdue. Due date was " + loan.getDueDate() + ".";
+            notificationService.createLoanNotification(loan, msg);
+            count++;
+        }
+        return count;
     }
 
 

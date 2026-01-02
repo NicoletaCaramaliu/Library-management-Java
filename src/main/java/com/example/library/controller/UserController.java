@@ -20,9 +20,20 @@ public class UserController {
     }
 
     // GET /api/users
-    @GetMapping
+    @GetMapping("/active")
     public List<User> getAllActive() {
         return userService.getAllActiveUsers();
+    }
+
+    @GetMapping("/all")
+    public List<User> getAll() {
+        return userService.getAllUsers();
+    }
+
+    //activate user
+    @PutMapping("/{id}/activate")
+    public User activate(@PathVariable Long id) {
+        return userService.activateUser(id);
     }
 
     // GET /api/users/{id}
