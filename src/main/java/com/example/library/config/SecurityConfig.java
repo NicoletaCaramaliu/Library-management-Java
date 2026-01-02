@@ -48,6 +48,19 @@ public class SecurityConfig {
                         // USER NEAUTENTIFICAT PENTRU POST
                         .requestMatchers(HttpMethod.POST, "/api/users/**").anonymous()
 
+                        // loans
+                        .requestMatchers("/api/loans/borrow/**").authenticated()
+                        .requestMatchers("/api/loans/me").authenticated()
+
+                        .requestMatchers(HttpMethod.GET, "/api/loans").hasAnyRole("LIBRARIAN", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/loans/overdue").hasAnyRole("LIBRARIAN", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/loans/user/**").hasAnyRole("LIBRARIAN", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/loans").hasAnyRole("LIBRARIAN", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/loans/**").hasAnyRole("LIBRARIAN", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/loans/me/active").hasRole("USER")
+                        .requestMatchers(HttpMethod.GET, "/api/loans/allActive").hasAnyRole("LIBRARIAN", "ADMIN")
+
+
                         // orice user autentificat poate cere imprumut/vedea istoricul propriu
                         .requestMatchers("/api/loans/**").authenticated()
 

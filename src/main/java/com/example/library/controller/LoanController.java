@@ -4,6 +4,7 @@ import com.example.library.model.Loan;
 import com.example.library.service.LoanService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.security.core.Authentication;
 
 import java.util.List;
 
@@ -51,9 +52,12 @@ public class LoanController {
 
     // POST /api/loans/{id}/return
     @PostMapping("/{id}/return")
-    public Loan returnLoan(@PathVariable Long id) {
-        return loanService.returnLoan(id);
+    public Loan returnLoan(@PathVariable Long id,
+                           Authentication authentication) {
+        String email = authentication.getName(); // username = email
+        return loanService.returnLoan(id, email);
     }
+
 
     // DELETE /api/loans/{id}
     @DeleteMapping("/{id}")
@@ -61,4 +65,35 @@ public class LoanController {
     public void delete(@PathVariable Long id) {
         loanService.deleteLoan(id);
     }
+
+    // POST /api/loans/borrow/{bookId}
+    @PostMapping("/borrow/{bookId}")
+    @ResponseStatus(HttpStatus.CREATED)
+    public Loan borrowForCurrentUser(@PathVariable Long bookId,
+                                     Authentication authentication) {
+        String email = authentication.getName(); // username = email
+        return loanService.createLoanForUserEmail(email, bookId);
+    }
+
+    // GET /api/loans/me
+    @GetMapping("/me")
+    public List<Loan> getMyLoans(Authentication authentication) {
+        String email = authentication.getName();
+        return loanService.getLoansForUserEmail(email);
+    }
+
+    // GET /api/loans/me/active
+    @GetMapping("/me/active")
+    public List<Loan> getMyActiveLoans(Authentication authentication) {
+        String email = authentication.getName();
+        return loanService.getActiveLoansForUserEmail(email);
+    }
+
+    // GET /api/loans/allActive
+    @GetMapping("/allActive")
+    public List<Loan> getAllActiveLoans() {
+        return loanService.getAllActiveLoans();
+    }
+
+
 }
