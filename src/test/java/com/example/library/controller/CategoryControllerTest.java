@@ -49,8 +49,8 @@ class CategoryControllerTest {
     }
 
     @Test
-    @WithMockUser       // simulăm un user logat
-    @DisplayName("GET /api/categories - ar trebui să întoarcă lista de categorii")
+    @WithMockUser
+    @DisplayName("GET /api/categories ")
     void getAll_shouldReturnListOfCategories() throws Exception {
         List<Category> categories = Arrays.asList(
                 buildCategory(1L, "Fiction", "Fiction books"),
@@ -71,7 +71,7 @@ class CategoryControllerTest {
 
     @Test
     @WithMockUser
-    @DisplayName("GET /api/categories/{id} - ar trebui să întoarcă categoria cu ID-ul dat")
+    @DisplayName("GET /api/categories/{id} ")
     void getById_shouldReturnCategory() throws Exception {
         Category category = buildCategory(1L, "Fiction", "Fiction books");
         Mockito.when(categoryService.getCategoryById(1L)).thenReturn(category);
@@ -85,7 +85,7 @@ class CategoryControllerTest {
 
     @Test
     @WithMockUser
-    @DisplayName("POST /api/categories - ar trebui să creeze o categorie și să întoarcă 201")
+    @DisplayName("POST /api/categories")
     void create_shouldCreateCategory() throws Exception {
         Category requestCategory = buildCategory(null, "Fiction", "Fiction books");
         Category savedCategory = buildCategory(1L, "Fiction", "Fiction books");
@@ -104,7 +104,7 @@ class CategoryControllerTest {
 
     @Test
     @WithMockUser
-    @DisplayName("PUT /api/categories/{id} - ar trebui să actualizeze categoria și să întoarcă obiectul")
+    @DisplayName("PUT /api/categories/{id}")
     void update_shouldUpdateCategory() throws Exception {
         Category requestCategory = buildCategory(null, "Updated", "Updated description");
         Category updatedCategory = buildCategory(1L, "Updated", "Updated description");
@@ -124,7 +124,7 @@ class CategoryControllerTest {
 
     @Test
     @WithMockUser
-    @DisplayName("DELETE /api/categories/{id} - ar trebui să șteargă categoria și să întoarcă 204")
+    @DisplayName("DELETE /api/categories/{id}")
     void delete_shouldDeleteCategory() throws Exception {
         Mockito.doNothing().when(categoryService).deleteCategory(1L);
 

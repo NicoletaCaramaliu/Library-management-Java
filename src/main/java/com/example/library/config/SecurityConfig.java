@@ -32,7 +32,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "/api/books/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").authenticated()
 
-                        // doar LIBRARIAN + ADMIN pot adăuga carti
+                        // doar LIBRARIAN + ADMIN pot adauga carti
                         .requestMatchers(HttpMethod.POST, "/api/books/**").hasAnyRole("LIBRARIAN", "ADMIN")
 
                         .requestMatchers(HttpMethod.PUT, "/api/books/**").hasAnyRole("LIBRARIAN", "ADMIN")
