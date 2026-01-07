@@ -137,7 +137,7 @@ Entități principale:
 - **Book — Review (1:N)**
 - **User — Notification (1:N)**
 
-> Diagrama ERD a fost generată cu **MySQL Workbench** și este inclusă în [documentația proiectului](docs)..
+> Diagrama ERD a fost generată cu **MySQL Workbench** și este inclusă în [documentația proiectului](docs).
 
 ---
 
