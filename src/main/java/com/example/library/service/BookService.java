@@ -1,0 +1,73 @@
+package com.example.library.service;
+
+import com.example.library.exception.BusinessException;
+import com.example.library.model.Book;
+import com.example.library.repository.BookRepository;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+
+import java.util.List;
+
+@Service
+public class BookService {
+
+    private final BookRepository bookRepository;
+
+    public BookService(BookRepository bookRepository) {
+        this.bookRepository = bookRepository;
+    }
+
+    public List<Book> getAllBooks() {
+        return bookRepository.findAll();
+    }
+
+    public Book getBookById(Long id) {
+        return bookRepository.findById(id)
+                .orElseThrow(() -> new BusinessException("Book not found with id: " + id, HttpStatus.NOT_FOUND));
+    }
+
+    public Book createBook(Book book) {
+        book.setId(null);
+        return bookRepository.save(book);
+    }
+
+    public Book updateBook(Long id, Book updatedBook) {
+        Book existing = getBookById(id);
+
+        existing.setTitle(updatedBook.getTitle());
+        existing.setAuthor(updatedBook.getAuthor());
+        existing.setIsbn(updatedBook.getIsbn());
+        existing.setPublishedYear(updatedBook.getPublishedYear());
+        existing.setAvailableCopies(updatedBook.getAvailableCopies());
+
+        return bookRepository.save(existing);
+    }
+
+    public void deleteBook(Long id) {
+        Book existing = getBookById(id);
+        bookRepository.delete(existing);
+    }
+
+    public List<Book> searchByTitle(String title) {
+        return bookRepository.findByTitleContainingIgnoreCase(title);
+    }
+
+    public List<Book> searchByAuthor(String author) {
+        return bookRepository.findByAuthorContainingIgnoreCase(author);
+    }
+
+    public List<Book> searchByCategoryName(String categoryName) {
+        return bookRepository.findByCategory_NameIgnoreCase(categoryName);
+    }
+
+    public List<Book> searchAnywhere(String keyword) {
+        return bookRepository
+                .findByTitleContainingIgnoreCaseOrAuthorContainingIgnoreCaseOrCategory_NameContainingIgnoreCase(
+                        keyword,
+                        keyword,
+                        keyword
+                );
+
+    }
+
+}
